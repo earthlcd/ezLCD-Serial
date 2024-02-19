@@ -17,17 +17,25 @@
 debug_port = 2 -- USB Virtual Comm Port
 
 
-Stop_lua = 0 -- flag to stop the Lua script when set to 1
-
+CommandBuffer = ""		-- Used to hold incomming characters until we see an end of line
+CommandFound = false 	-- Flag to indicate when we have received a command
+Command = "" 			-- Command to parse in the parser
 -----------------------
 -- Event Handelers
 -----------------------
 -- Serial Port Event
 function DebugPortReceiveFunction(byte)
-	ez.SerialTx(byte, debug_port, 1)
-	if byte == string.byte("b")  then
-		ez.SerialTx("Found b", debug_port, 80)
-		stop_lua = 1
+	-- ez.SerialTx(byte, debug_port, 1) -- Uncomment to echo character back as they are received
+	if byte == 13  or byte == 10 then
+		-- Command = string.sub(CommandBuffer, 1, -2)
+		if string.len(CommandBuffer) > 0 then
+			Command = CommandBuffer
+			CommandBuffer = ""
+			CommandFound = true
+			ez.SerialTx("Command:" .. Command .. "\r\n", debug_port, 80)
+		end
+	else
+		CommandBuffer = CommandBuffer .. string.char(byte)
 	end
 end
 
@@ -54,10 +62,16 @@ while 1 do
 	ez.SerialTx(ez.LuaVer .. "\r\n", debug_port, 80)
 	ez.SerialTx("S/N: " .. ez.SerialNo .. "\r\n", debug_port, 80)
 	ez.SerialTx(ez.Width .. "x" .. ez.Height .. "\r\n", debug_port, 80)
-	if stop_lua == 1 then
-		ez.SerialTx("Lua Stopped\r\n", debug_port, 80)
-		ez.Cls(ez.RGB(0,0,0))
-		break
+	if CommandFound == true then
+		if Command == "hello" then
+			ez.SerialTx("back at ya\r\n", debug_port, 80)
+		end
+		if Command == "break" then
+			ez.SerialTx("Lua Stopped\r\n", debug_port, 80)
+			ez.Cls(ez.RGB(0,0,0))
+			break
+		end
+		CommandFound = false
 	end
 end
 
