@@ -42,13 +42,13 @@ ez.SerialOpen("DebugPortReceiveFunction", debug_port)
 
 -- Main
 while 1 do
-	-- Wait 10 seconds for USB to enumerate
+	-- Wait X seconds (incase USB has yet to enumerate)
 	ez.Wait_ms(2500)
 	ez.Cls(ez.RGB(255,0,0)) -- Change the screen color to red
 	ez.Wait_ms(2500)
 	ez.Cls(ez.RGB(0,255,0)) -- Change the screen color to green
 	ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
-	ez.SerialTx("* EarthLCD Serial Communications Scale\r\n", debug_port, 80)
+	ez.SerialTx("* EarthLCD Serial Communications Break Example\r\n", debug_port, 80)
 	ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
 	ez.SerialTx(ez.FirmVer .. "\r\n", debug_port, 80)
 	ez.SerialTx(ez.LuaVer .. "\r\n", debug_port, 80)
