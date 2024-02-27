@@ -26,12 +26,14 @@ Command = "" 			-- Command to parse in the parser
 -- Serial Port Event
 function DebugPortReceiveFunction(byte)
 	-- ez.SerialTx(byte, debug_port, 1) -- Uncomment to echo character back as they are received
-	if byte == 13  or byte == 10 then
-		-- Command = string.sub(CommandBuffer, 1, -2)
+	if byte == 13 or byte == 10 then
 		if string.len(CommandBuffer) > 0 then
 			Command = CommandBuffer
 			CommandBuffer = ""
 			CommandFound = true
+
+			-- ez.SetXY(0,0)
+			print("Command:" .. Command .. "\r\n")
 			ez.SerialTx("Command:" .. Command .. "\r\n", debug_port, 80)
 		end
 	else
@@ -50,19 +52,29 @@ ez.SerialOpen("DebugPortReceiveFunction", debug_port)
 
 -- Main
 while 1 do
-	-- Wait X seconds (incase USB has yet to enumerate)
-	ez.Wait_ms(2500)
-	ez.Cls(ez.RGB(255,0,0)) -- Change the screen color to red
-	ez.Wait_ms(2500)
-	ez.Cls(ez.RGB(0,255,0)) -- Change the screen color to green
-	ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
-	ez.SerialTx("* EarthLCD Serial Communications Break Example\r\n", debug_port, 80)
-	ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
-	ez.SerialTx(ez.FirmVer .. "\r\n", debug_port, 80)
-	ez.SerialTx(ez.LuaVer .. "\r\n", debug_port, 80)
-	ez.SerialTx("S/N: " .. ez.SerialNo .. "\r\n", debug_port, 80)
-	ez.SerialTx(ez.Width .. "x" .. ez.Height .. "\r\n", debug_port, 80)
+	-- ez.SerialTx("looping...\r\n", debug_port, 80)
+	-- ez.Cls(ez.RGB(255,0,255))
+	-- ez.Wait_ms(2500)
+
 	if CommandFound == true then
+		if Command == "about" then
+			ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
+			ez.SerialTx("* EarthLCD Serial Communications Break Example\r\n", debug_port, 80)
+			ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
+			ez.SerialTx(ez.FirmVer .. "\r\n", debug_port, 80)
+			ez.SerialTx(ez.LuaVer .. "\r\n", debug_port, 80)
+			ez.SerialTx("S/N: " .. ez.SerialNo .. "\r\n", debug_port, 80)
+			ez.SerialTx(ez.Width .. "x" .. ez.Height .. "\r\n", debug_port, 80)
+		end
+		if Command == "red" then
+			ez.Cls(ez.RGB(255,0,0)) -- Change the screen color to red
+		end
+		if Command == "green" then
+			ez.Cls(ez.RGB(0,255,0)) -- Change the screen color to green
+		end
+		if Command == "blue" then
+			ez.Cls(ez.RGB(0,0,255)) -- Change the screen color to green
+		end
 		if Command == "hello" then
 			ez.SerialTx("back at ya\r\n", debug_port, 80)
 		end
