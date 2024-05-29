@@ -9,8 +9,8 @@
 ----------------------------------------------------------------------
 
 -- Set debug_port to one of thsee Serial Port Numbers:
--- 0=Main UART (default)
--- 1=Second UART
+-- 0=Main UART (default, USART2 on ezLCD-5035)
+-- 1=Second UART (USART3 on ezLCD-5035)
 -- 2=USB Virtual Comm Port
 -- 3=ESP32 UART0
 -- 4=Third UART (SE-2023 RS232)
@@ -46,6 +46,12 @@ end
 -----------------------
 
 ez.Cls(ez.RGB(255,0,255))
+-- Make the font a blue-ish white color
+ez.SetColor(ez.RGB(200,200,255))
+print("serial_parser.lua")
+print("")
+print("  Commands:")
+print("    about, red, green, blue, break")
 
 -- open the RS-232 port
 ez.SerialOpen("DebugPortReceiveFunction", debug_port)
@@ -86,6 +92,12 @@ while 1 do
 		CommandFound = false
 	end
 end
+
+-- Clear the screen
+ez.Cls(ez.RGB(0,0,0))
+-- Make the font a blue-ish white color
+ez.SetColor(ez.RGB(200,200,255))
+print("Exiting serial_parser.lua")
 
 ez.SerialTx("Exited main loop\r\n", debug_port, 80)
 ez.SerialClose(debug_port)
