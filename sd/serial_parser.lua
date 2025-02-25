@@ -25,20 +25,20 @@ Command = "" 			-- Command to parse in the parser
 -----------------------
 -- Serial Port Event
 function DebugPortReceiveFunction(byte)
-	-- ez.SerialTx(byte, debug_port, 1) -- Uncomment to echo character back as they are received
-	if byte == 13 or byte == 10 then
-		if string.len(CommandBuffer) > 0 then
-			Command = CommandBuffer
-			CommandBuffer = ""
-			CommandFound = true
+  -- ez.SerialTx(byte, debug_port, 1) -- Uncomment to echo character back as they are received
+  if byte == 13 or byte == 10 then
+    if string.len(CommandBuffer) > 0 then
+      Command = CommandBuffer
+      CommandBuffer = ""
+      CommandFound = true
 
-			-- ez.SetXY(0,0)
-			print("Command:" .. Command .. "\r\n")
-			ez.SerialTx("Command:" .. Command .. "\r\n", debug_port, 80)
-		end
-	else
-		CommandBuffer = CommandBuffer .. string.char(byte)
-	end
+      -- ez.SetXY(0,0)
+      print("Command:" .. Command .. "\r\n")
+      ez.SerialTx("Command:" .. Command .. "\r\n", debug_port, 80)
+    end
+  else
+    CommandBuffer = CommandBuffer .. string.char(byte)
+  end
 end
 
 -----------------------
@@ -58,39 +58,55 @@ ez.SerialOpen("DebugPortReceiveFunction", debug_port)
 
 -- Main
 while 1 do
-	-- ez.SerialTx("looping...\r\n", debug_port, 80)
-	-- ez.Cls(ez.RGB(255,0,255))
-	-- ez.Wait_ms(2500)
+  -- ez.SerialTx("looping...\r\n", debug_port, 80)
+  -- ez.Cls(ez.RGB(255,0,255))
+  -- ez.Wait_ms(2500)
 
-	if CommandFound == true then
-		if Command == "about" then
-			ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
-			ez.SerialTx("* EarthLCD Serial Communications Break Example\r\n", debug_port, 80)
-			ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
-			ez.SerialTx(ez.FirmVer .. "\r\n", debug_port, 80)
-			ez.SerialTx(ez.LuaVer .. "\r\n", debug_port, 80)
-			ez.SerialTx("S/N: " .. ez.SerialNo .. "\r\n", debug_port, 80)
-			ez.SerialTx(ez.Width .. "x" .. ez.Height .. "\r\n", debug_port, 80)
+  if CommandFound == true then
+    if Command == "about" then
+      ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
+      ez.SerialTx("* EarthLCD Serial Communications Break Example\r\n", debug_port, 80)
+      ez.SerialTx("**********************************************************************\r\n", debug_port, 80)
+      ez.SerialTx(ez.FirmVer .. "\r\n", debug_port, 80)
+      ez.SerialTx(ez.LuaVer .. "\r\n", debug_port, 80)
+      ez.SerialTx("S/N: " .. ez.SerialNo .. "\r\n", debug_port, 80)
+      ez.SerialTx(ez.Width .. "x" .. ez.Height .. "\r\n", debug_port, 80)
+    end
+    if Command == "red" then
+      ez.Cls(ez.RGB(255,0,0)) -- Change the screen color to red
+    end
+    if Command == "green" then
+      ez.Cls(ez.RGB(0,255,0)) -- Change the screen color to green
+    end
+    if Command == "blue" then
+      ez.Cls(ez.RGB(0,0,255)) -- Change the screen color to green
+    end
+    if string.match(Command, "^touch") == "touch" then
+      ez.Cls(ez.RGB(0,0,0)) -- Change the screen color to black
+      local pos = 0
+      local x = -1
+      local y = -1
+      for id in string.gmatch(Command, "%S+") do
+        if pos == 1 then
+          x = tonumber(id)
+        end
+        if pos == 2 then
+          y = tonumber(id)
+        end
+        pos = pos + 1
+      end
+			print("x:" .. x .. "y:" .. y .. "\r\n")
 		end
-		if Command == "red" then
-			ez.Cls(ez.RGB(255,0,0)) -- Change the screen color to red
-		end
-		if Command == "green" then
-			ez.Cls(ez.RGB(0,255,0)) -- Change the screen color to green
-		end
-		if Command == "blue" then
-			ez.Cls(ez.RGB(0,0,255)) -- Change the screen color to green
-		end
-		if Command == "hello" then
-			ez.SerialTx("back at ya\r\n", debug_port, 80)
-		end
-		if Command == "break" then
-			ez.SerialTx("Lua Stopped\r\n", debug_port, 80)
-			ez.Cls(ez.RGB(0,0,0))
-			break
-		end
-		CommandFound = false
-	end
+    if Command == "hello" then
+      ez.SerialTx("back at ya\r\n", debug_port, 80)
+    end
+    if Command == "break" then
+      ez.SerialTx("Lua Stopped\r\n", debug_port, 80)
+      ez.Cls(ez.RGB(0,0,0))
+      break
+    end
+    CommandFound = false
+  end
 end
 
 -- Clear the screen
